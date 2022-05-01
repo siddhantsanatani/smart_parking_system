@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "271815185034",
+    "project_id": "smart-parking-app-parkinn",
+    "storage_bucket": "smart-parking-app-parkinn.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:271815185034:android:a3261eb9fa4b9527e8d373",
+        "android_client_info": {
+          "package_name": "design.siddhantsanatani.smart_parking_system"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "271815185034-cslbjc93ubhs0mro8i28c4149tlrhape.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDn0JDf14CZS7HqXzq8LCfMGKst54zC7Jo"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "271815185034-cslbjc93ubhs0mro8i28c4149tlrhape.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
