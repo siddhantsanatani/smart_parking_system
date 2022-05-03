@@ -1,13 +1,11 @@
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:smart_parking_system/tools/widget.dart';
 import '../design_system/glassmorphism.dart';
 import '../tools/map.dart';
+import '../tools/mapstate.dart';
 import '/design_system/styles.dart';
-import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:smart_parking_system/tools/card.dart';
-import 'package:flutter_form_bloc/flutter_form_bloc.dart';
 
 import 'navigation_drawer.dart';
 
@@ -20,6 +18,7 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreen extends State<HomeScreen> {
+  final appState = AppState();
   final _auth = FirebaseAuth.instance;
   late User loggedInUser;
 
@@ -32,7 +31,7 @@ class _HomeScreen extends State<HomeScreen> {
 
   void getCurrentUser() async {
     try {
-      final user = await _auth.currentUser;
+      final user = _auth.currentUser;
       if (user != null) {
         loggedInUser = user;
       }
@@ -84,6 +83,88 @@ class _HomeScreen extends State<HomeScreen> {
         child: Stack(
           children: [
             const AppMap(),
+            Positioned(
+              top: 50.0,
+              right: 15.0,
+              left: 15.0,
+              child: Container(
+                height: 50.0,
+                width: double.infinity,
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(3.0),
+                  color: Colors.white,
+                  boxShadow: const [
+                    BoxShadow(
+                        color: Colors.grey,
+                        offset: Offset(1.0, 5.0),
+                        blurRadius: 10,
+                        spreadRadius: 3)
+                  ],
+                ),
+                child: TextField(
+                  cursorColor: Colors.black,
+                  controller: AppState.locationController,
+                  decoration: InputDecoration(
+                    icon: Container(
+                      margin: const EdgeInsets.only(left: 20, top: 5),
+                      width: 10,
+                      height: 10,
+                      child: const Icon(
+                        Icons.location_on,
+                        color: Colors.black,
+                      ),
+                    ),
+                    hintText: "pick up",
+                    border: InputBorder.none,
+                    contentPadding:
+                        const EdgeInsets.only(left: 15.0, top: 16.0),
+                  ),
+                ),
+              ),
+            ),
+            Positioned(
+              top: 105.0,
+              right: 15.0,
+              left: 15.0,
+              child: Container(
+                height: 50.0,
+                width: double.infinity,
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(3.0),
+                  color: Colors.white,
+                  boxShadow: const [
+                    BoxShadow(
+                        color: Colors.grey,
+                        offset: Offset(1.0, 5.0),
+                        blurRadius: 10,
+                        spreadRadius: 3)
+                  ],
+                ),
+                child: TextField(
+                  cursorColor: Colors.black,
+                  controller: AppState.destinationController,
+                  textInputAction: TextInputAction.go,
+                  onSubmitted: (value) {
+                    appState.sendRequest(value);
+                  },
+                  decoration: InputDecoration(
+                    icon: Container(
+                      margin: const EdgeInsets.only(left: 20, top: 5),
+                      width: 10,
+                      height: 10,
+                      child: const Icon(
+                        Icons.local_taxi,
+                        color: Colors.black,
+                      ),
+                    ),
+                    hintText: "destination?",
+                    border: InputBorder.none,
+                    contentPadding:
+                        const EdgeInsets.only(left: 15.0, top: 16.0),
+                  ),
+                ),
+              ),
+            ),
             Column(
               mainAxisAlignment: MainAxisAlignment.end,
               crossAxisAlignment: CrossAxisAlignment.end,

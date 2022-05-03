@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:smart_parking_system/Screens/welcome_screen.dart';
 import 'Screens/success_screen.dart';
 import 'design_system/styles.dart';
-import 'tools/location.dart';
 import 'Screens/login_screen.dart';
 import 'Screens/home.dart';
 import 'Screens/registration_screen.dart';

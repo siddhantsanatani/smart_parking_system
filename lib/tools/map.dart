@@ -1,8 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_spinkit/flutter_spinkit.dart';
+import 'package:provider/provider.dart';
 import '/design_system/styles.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'card.dart';
 import 'package:flutter_form_bloc/flutter_form_bloc.dart';
+
+import 'mapstate.dart';
 
 class AppMap extends StatefulWidget {
   const AppMap({Key? key}) : super(key: key);
@@ -12,22 +16,53 @@ class AppMap extends StatefulWidget {
 }
 
 class _AppMap extends State<AppMap> {
+  final appState = AppState();
   final destination = TextFieldBloc();
   late GoogleMapController mapController;
-  static const _initialPosition = LatLng(22.236151, 84.884857);
-  LatLng lastPosition = _initialPosition;
+  late LatLng lastPosition;
   final Set<Marker> _markers = {};
   @override
   Widget build(BuildContext context) {
-    return GoogleMap(
-      initialCameraPosition: CameraPosition(target: lastPosition, zoom: 10),
-      onMapCreated: markerCreated,
-      myLocationEnabled: true,
-      myLocationButtonEnabled: false,
-      mapType: MapType.normal,
-      compassEnabled: true,
-      markers: _markers,
-      onCameraMove: _onCameraMove,
+    final appState = Provider.of<AppState>(context);
+    lastPosition = appState.lastPosition;
+    return SafeArea(
+      child: appState.initialPosition == null
+          ? Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: const [
+                    SpinKitRotatingCircle(
+                      color: Colors.black,
+                      size: 50.0,
+                    )
+                  ],
+                ),
+                const SizedBox(
+                  height: 10,
+                ),
+                Visibility(
+                  visible: appState.locationServiceActive == false,
+                  child: const Text(
+                    "Please enable location services!",
+                    style: TextStyle(color: Colors.grey, fontSize: 18),
+                  ),
+                )
+              ],
+            )
+          : GoogleMap(
+              initialCameraPosition:
+                  CameraPosition(target: lastPosition, zoom: 10),
+              myLocationEnabled: true,
+              myLocationButtonEnabled: false,
+              mapType: MapType.normal,
+              compassEnabled: true,
+              onMapCreated: appState.onCreated,
+              markers: appState.markers,
+              onCameraMove: appState.onCameraMove,
+              polylines: appState.polyLines,
+            ),
     );
   }
 
