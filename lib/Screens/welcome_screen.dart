@@ -37,7 +37,7 @@ class _WelcomeScreen extends State<WelcomeScreen>
     controller.addStatusListener((status) {
       // setState(() {});
       if (controller.isCompleted) {
-        Navigator.pushNamed(context, HomeScreen.id);
+        Navigator.pushReplacementNamed(context, HomeScreen.id);
       }
     });
     // animation = TimelineTween<AnimProps>()
@@ -105,6 +105,8 @@ class _WelcomeScreen extends State<WelcomeScreen>
   Widget build(BuildContext context) {
     var scrSize = MediaQuery.of(context).size;
     return Scaffold(
+      extendBody: true,
+      resizeToAvoidBottomInset: false,
       backgroundColor: AppColors.lightBlue,
       body: SafeArea(
         left: false,

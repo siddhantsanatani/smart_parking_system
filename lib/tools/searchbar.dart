@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import '/design_system/styles.dart';
+import 'mapstate.dart';
 
 class SearchBar extends StatelessWidget {
   final double top;
@@ -8,20 +10,23 @@ class SearchBar extends StatelessWidget {
   final double bottom;
   final double width;
   final double height;
-  const SearchBar(
-      {Key? key,
-      this.top = 0,
-      this.bottom = 0,
-      this.height = 50,
-      this.left = 10,
-      this.right = 10,
-      this.width = double.infinity})
-      : super(
+  TextEditingController searchBarController = TextEditingController();
+  SearchBar({
+    Key? key,
+    this.top = 0,
+    this.bottom = 0,
+    this.height = 50,
+    this.left = 10,
+    this.right = 10,
+    this.width = double.infinity,
+    // required this.searchBarController
+  }) : super(
           key: key,
         );
 
   @override
   Widget build(BuildContext context) {
+    final appState = Provider.of<AppState>(context);
     return Container(
       alignment: Alignment.bottomCenter,
       margin: EdgeInsets.fromLTRB(left, top, right, bottom),
@@ -31,6 +36,8 @@ class SearchBar extends StatelessWidget {
         children: [
           Expanded(
             child: TextFormField(
+              controller: searchBarController,
+              textInputAction: TextInputAction.search,
               decoration: InputDecoration(
                 prefixIcon: Container(
                   width: 48,
@@ -56,6 +63,12 @@ class SearchBar extends StatelessWidget {
                   color: AppColors.dark,
                 ),
               ),
+              onEditingComplete: () {
+                appState.sendDestinationRequest(searchBarController.text);
+              },
+              onFieldSubmitted: (text) {
+                appState.sendDestinationRequest(text);
+              },
             ),
           ),
           const SizedBox(width: 5),

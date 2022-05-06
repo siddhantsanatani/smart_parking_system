@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_form_bloc/flutter_form_bloc.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
+import 'package:getwidget/getwidget.dart';
 import 'package:smart_parking_system/Screens/success_screen.dart';
 import '/design_system/styles.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -38,17 +39,8 @@ class _WizardFormState extends State<WizardFormReg> {
       create: (context) => WizardFormBloc(),
       child: Builder(
         builder: (context) {
-          // Theme(
-          // data: Theme.of(context).copyWith(
-          //   inputDecorationTheme: InputDecorationTheme(
-          //     border: OutlineInputBorder(
-          //       borderRadius: BorderRadius.circular(20),
-          //     ),
-          //   ),
-          // ),
-          // child:
           return Scaffold(
-            resizeToAvoidBottomInset: false,
+            resizeToAvoidBottomInset: true,
             body: BlurryModalProgressHUD(
               inAsyncCall: showSpinner,
               blurEffectIntensity: 4,
@@ -61,6 +53,8 @@ class _WizardFormState extends State<WizardFormReg> {
               color: AppColors.overlay,
               child: SafeArea(
                 child: SingleChildScrollView(
+                  keyboardDismissBehavior:
+                      ScrollViewKeyboardDismissBehavior.onDrag,
                   scrollDirection: Axis.vertical,
                   child: Container(
                     color: Colors.white,
@@ -105,25 +99,55 @@ class _WizardFormState extends State<WizardFormReg> {
                             crossAxisAlignment: CrossAxisAlignment.stretch,
                           ),
                         ),
-                        const SizedBox(
-                          height: 10,
-                        ),
+                        const SizedBox(height: 10),
                         FormBlocListener<WizardFormBloc, String, String>(
-                          onSubmitting: (context, state) =>
-                              LoadingDialog.show(context),
+                          // onSubmitting: (context, state) =>
+                          //     LoadingDialog.show(context),
                           onSuccess: (context, state) async {
-                            LoadingDialog.hide(context);
-                            if (state.stepCompleted == state.lastStep) {
+                            // LoadingDialog.hide(context);
+                            if (state.stepCompleted == 0) {
                               setState(() {
                                 showSpinner = true;
                               });
                               await _auth
                                   .createUserWithEmailAndPassword(
                                       email: email, password: password)
-                                  .then((value) => print('User added'))
-                                  .onError((error, stackTrace) => print(error));
+                                  .then((value) {
+                                GFToast.showToast("Account Added.", context,
+                                    toastDuration: 2,
+                                    toastPosition: GFToastPosition.BOTTOM_RIGHT,
+                                    // toastBorderRadius: 1,
+                                    backgroundColor: AppColors.navy,
+                                    textStyle: const TextStyle(
+                                        color: Colors.white, fontSize: 16.0));
+                                GFToast.showToast(
+                                    "Continue filling Personal Details",
+                                    context,
+                                    toastDuration: 2,
+                                    toastPosition: GFToastPosition.BOTTOM_RIGHT,
+                                    // toastBorderRadius: 1,
+                                    backgroundColor: AppColors.navy,
+                                    textStyle: const TextStyle(
+                                        color: Colors.white, fontSize: 16.0));
+                              }).onError((error, stackTrace) {
+                                GFToast.showToast(error.toString(), context,
+                                    toastDuration: 3,
+                                    toastPosition: GFToastPosition.BOTTOM_RIGHT,
+                                    // toastBorderRadius: 1,
+                                    backgroundColor: AppColors.pink,
+                                    textStyle: const TextStyle(
+                                        color: Colors.white, fontSize: 16.0));
+                              });
+                              setState(() {
+                                showSpinner = false;
+                              });
+                            } else if (state.stepCompleted == state.lastStep) {
+                              setState(() {
+                                showSpinner = true;
+                              });
                               users
-                                  .add({
+                                  .doc(_auth.currentUser!.uid)
+                                  .set({
                                     'firstName': firstName,
                                     'gender': gender,
                                     'idCardNum': idCardNum,
@@ -137,16 +161,15 @@ class _WizardFormState extends State<WizardFormReg> {
                                   .then((value) => print("User Added"))
                                   .onError((error, stackTrace) =>
                                       print("Failed to add user: $error"));
-
                               Navigator.pushNamed(context, SuccessScreen.id);
                               setState(() {
                                 showSpinner = false;
                               });
                             }
                           },
-                          onFailure: (context, state) {
-                            LoadingDialog.hide(context);
-                          },
+                          // onFailure: (context, state) {
+                          //   LoadingDialog.hide(context);
+                          // },
                           child: StepperFormBlocBuilder<WizardFormBloc>(
                             formBloc: context.read<WizardFormBloc>(),
                             physics: const ClampingScrollPhysics(),
@@ -447,32 +470,32 @@ class WizardFormBloc extends FormBloc<String, String> {
   }
 }
 
-class LoadingDialog extends StatelessWidget {
-  static void show(BuildContext context, {Key? key}) => showDialog<void>(
-        context: context,
-        useRootNavigator: false,
-        barrierDismissible: false,
-        builder: (_) => LoadingDialog(key: key),
-      ).then((_) => FocusScope.of(context).requestFocus(FocusNode()));
+// class LoadingDialog extends StatelessWidget {
+//   static void show(BuildContext context, {Key? key}) => showDialog<void>(
+//         context: context,
+//         useRootNavigator: false,
+//         barrierDismissible: false,
+//         builder: (_) => LoadingDialog(key: key),
+//       ).then((_) => FocusScope.of(context).requestFocus(FocusNode()));
 
-  static void hide(BuildContext context) => Navigator.pop(context);
+//   static void hide(BuildContext context) => Navigator.pop(context);
 
-  const LoadingDialog({Key? key}) : super(key: key);
+//   const LoadingDialog({Key? key}) : super(key: key);
 
-  @override
-  Widget build(BuildContext context) {
-    return WillPopScope(
-      onWillPop: () async => false,
-      child: Center(
-        child: Card(
-          child: Container(
-            width: 80,
-            height: 80,
-            padding: const EdgeInsets.all(12.0),
-            // child: const CircularProgressIndicator(),
-          ),
-        ),
-      ),
-    );
-  }
-}
+//   @override
+//   Widget build(BuildContext context) {
+//     return WillPopScope(
+//       onWillPop: () async => false,
+//       child: Center(
+//         child: Card(
+//           child: Container(
+//             width: 80,
+//             height: 80,
+//             padding: const EdgeInsets.all(12.0),
+//             // child: const CircularProgressIndicator(),
+//           ),
+//         ),
+//       ),
+//     );
+//   }
+// }

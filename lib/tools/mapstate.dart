@@ -1,45 +1,59 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:geocoding/geocoding.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
-// import 'package:uber_clone/requests/google_maps_requests.dart';
+
+import 'package:permission_handler/permission_handler.dart';
 
 const apiKey = "AIzaSyCtpQKZE1tWznJ8ciDfT86qrO2-KA4vCvE";
 
-class AppState with ChangeNotifier, GetLocation {
+class AppState with ChangeNotifier {
   late LatLng _initialPosition;
-  late LatLng _lastPosition;
+  late LatLng _lastPosition = _initialPosition;
   bool locationServiceActive = true;
   final Set<Marker> _markers = {};
   final Set<Polyline> _polyLines = {};
-  late GoogleMapController _mapController;
+  // final GoogleMapController _mapController;
   final GoogleMapsServices _googleMapsServices = GoogleMapsServices();
   static TextEditingController locationController = TextEditingController();
   static TextEditingController destinationController = TextEditingController();
-  LatLng get initialPosition => _initialPosition;
-  LatLng get lastPosition => _lastPosition;
+  CameraPosition get initialPosition =>
+      CameraPosition(target: _initialPosition, zoom: 16);
+  CameraPosition get lastPosition => initialPosition;
   GoogleMapsServices get googleMapsServices => _googleMapsServices;
-  GoogleMapController get mapController => _mapController;
+  late GoogleMapController mapController;
   Set<Marker> get markers => _markers;
   Set<Polyline> get polyLines => _polyLines;
 
   AppState() {
-    _getUserLocation();
-    _loadingInitialPosition();
+    getUserLocation();
   }
+
 // ! TO GET THE USERS LOCATION
-  void _getUserLocation() async {
-    print("GET USER METHOD RUNNING =========");
-    LatLng position = await getLocation();
-    List<Placemark> placemark =
-        await placemarkFromCoordinates(position.latitude, position.longitude);
-    print(
-        "the latitude is: ${position.longitude} and the longitude is: ${position.longitude} ");
-    print("initial position is : ${_initialPosition.toString()}");
-    locationController.text = placemark[0].name!;
-    notifyListeners();
+  void getUserLocation() async {
+    try {
+      if (await Permission.location.request().isGranted) {
+        print("GET USER METHOD RUNNING =========");
+        Position position = await Geolocator.getCurrentPosition(
+            desiredAccuracy: LocationAccuracy.best);
+        _initialPosition = LatLng(position.latitude, position.longitude);
+        notifyListeners();
+      } else {
+        Position position = await Geolocator.getCurrentPosition(
+            desiredAccuracy: LocationAccuracy.best);
+        _initialPosition = LatLng(position.latitude, position.longitude);
+        List<Placemark> placemark = await placemarkFromCoordinates(
+            position.latitude, position.longitude);
+        locationController.text = placemark[0].name!;
+        notifyListeners();
+      }
+    } catch (error) {
+      print(error.toString());
+    }
   }
 
   // ! TO CREATE ROUTE
@@ -110,12 +124,22 @@ class AppState with ChangeNotifier, GetLocation {
     return lList;
   }
 
-  // ! SEND REQUEST
-  void sendRequest(String intendedLocation) async {
+  // Send destination request
+  void sendDestinationRequest(String destinationLocation) async {
+    List<Location> destinationLocations =
+        await locationFromAddress(destinationLocation);
+    CameraPosition destination = CameraPosition(
+        target: LatLng(destinationLocations[0].latitude,
+            destinationLocations[0].longitude),
+        zoom: 16);
+    mapController.animateCamera(CameraUpdate.newCameraPosition(destination));
+    notifyListeners();
+  }
+
+  // ! SEND Polyline REQUEST
+  void sendPolyLineRequest(String intendedLocation) async {
     List<Location> locations = await locationFromAddress(intendedLocation);
-    double latitude = locations[0].latitude;
-    double longitude = locations[0].longitude;
-    LatLng destination = LatLng(latitude, longitude);
+    LatLng destination = LatLng(locations[0].latitude, locations[0].longitude);
     _addMarker(destination, intendedLocation);
     String route = await _googleMapsServices.getRouteCoordinates(
         _initialPosition, destination);
@@ -131,32 +155,17 @@ class AppState with ChangeNotifier, GetLocation {
 
   // ! ON CREATE
   void onCreated(GoogleMapController controller) {
-    _mapController = controller;
+    // _mapController.complete(controller);
+    mapController = controller;
+    mapController
+        .animateCamera(CameraUpdate.newCameraPosition(initialPosition));
     notifyListeners();
   }
 
-//  LOADING INITIAL POSITION
-  void _loadingInitialPosition() async {
-    await Future.delayed(const Duration(seconds: 5)).then((v) {
-      if (_initialPosition == null) {
-        locationServiceActive = false;
-        notifyListeners();
-      }
-    });
-  }
-}
-
-class GetLocation {
-  Future<LatLng> getLocation() async {
-    // try {
-    Position position = await Geolocator.getCurrentPosition(
-        desiredAccuracy: LocationAccuracy.best);
-    LatLng currentPosition = LatLng(position.latitude, position.longitude);
-    return currentPosition;
-    // } catch (e) {
-    //   print(e);
-    //   return currentPosition = const LatLng(0, 0);
-    // }
+  @override
+  void dispose() {
+    mapController.dispose();
+    super.dispose();
   }
 }
 

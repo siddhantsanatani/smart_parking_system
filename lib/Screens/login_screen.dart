@@ -1,11 +1,11 @@
 import 'package:blurry_modal_progress_hud/blurry_modal_progress_hud.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_form_bloc/flutter_form_bloc.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
+import 'package:getwidget/getwidget.dart';
+import 'package:smart_parking_system/Screens/home.dart';
 import '/design_system/styles.dart';
-import 'home.dart';
 
 class WizardFormLogIn extends StatefulWidget {
   static String id = 'login_screen';
@@ -27,15 +27,6 @@ class _WizardFormLogInState extends State<WizardFormLogIn> {
       create: (context) => WizardFormBloc(),
       child: Builder(
         builder: (context) {
-          // Theme(
-          // data: Theme.of(context).copyWith(
-          //   inputDecorationTheme: InputDecorationTheme(
-          //     border: OutlineInputBorder(
-          //       borderRadius: BorderRadius.circular(20),
-          //     ),
-          //   ),
-          // ),
-          // child:
           return Scaffold(
             resizeToAvoidBottomInset: false,
             body: BlurryModalProgressHUD(
@@ -94,30 +85,47 @@ class _WizardFormLogInState extends State<WizardFormLogIn> {
                             crossAxisAlignment: CrossAxisAlignment.stretch,
                           ),
                         ),
-                        const SizedBox(
-                          height: 10,
-                          // child: IconButton(
-                          //     icon: Icon(_type == StepperType.horizontal
-                          //         ? Icons.swap_vert
-                          //         : Icons.swap_horiz),
-                          //     onPressed: _toggleType)
-                        ),
+                        const SizedBox(height: 10),
                         FormBlocListener<WizardFormBloc, String, String>(
-                          onSubmitting: (context, state) =>
-                              LoadingDialog.show(context),
+                          // onSubmitting: (context, state) =>
+                          //     LoadingDialog.show(context),
                           onSuccess: (context, state) async {
-                            LoadingDialog.hide(context);
+                            // LoadingDialog.hide(context);
                             if (state.stepCompleted == state.lastStep) {
                               setState(() {
-                                showSpinner = false;
+                                showSpinner = true;
                               });
                               try {
-                                final user =
-                                    await _auth.signInWithEmailAndPassword(
-                                        email: email, password: password);
+                                await _auth.signInWithEmailAndPassword(
+                                    email: email, password: password);
                                 if (_auth.currentUser != null) {
-                                  Navigator.pushNamed(context, HomeScreen.id);
+                                  GFToast.showToast(
+                                      "Signed In Successfully", context,
+                                      toastDuration: 2,
+                                      toastPosition:
+                                          GFToastPosition.BOTTOM_RIGHT,
+                                      // toastBorderRadius: 1,
+                                      backgroundColor: AppColors.navy,
+                                      textStyle: const TextStyle(
+                                          color: Colors.white, fontSize: 16.0));
+                                } else {
+                                  GFToast.showToast(
+                                      "Sign In Failed. Please verify your credential & try signing in again",
+                                      context,
+                                      toastDuration: const Duration(seconds: 3),
+                                      toastPosition:
+                                          GFToastPosition.BOTTOM_LEFT,
+                                      // toastBorderRadius: 1,
+                                      backgroundColor: AppColors.pink,
+                                      textStyle: const TextStyle(
+                                          color: Colors.white, fontSize: 16.0));
                                 }
+                                Navigator.pushAndRemoveUntil<void>(
+                                    context,
+                                    MaterialPageRoute<void>(
+                                        builder: (BuildContext context) =>
+                                            const HomeScreen()),
+                                    ModalRoute.withName('HomeScreen.id'));
                                 setState(() {
                                   showSpinner = false;
                                 });
@@ -126,9 +134,9 @@ class _WizardFormLogInState extends State<WizardFormLogIn> {
                               }
                             }
                           },
-                          onFailure: (context, state) {
-                            LoadingDialog.hide(context);
-                          },
+                          // onFailure: (context, state) {
+                          //   LoadingDialog.hide(context);
+                          // },
                           child: StepperFormBlocBuilder<WizardFormBloc>(
                             formBloc: context.read<WizardFormBloc>(),
                             // type: _type,
@@ -245,32 +253,32 @@ class WizardFormBloc extends FormBloc<String, String> {
   }
 }
 
-class LoadingDialog extends StatelessWidget {
-  static void show(BuildContext context, {Key? key}) => showDialog<void>(
-        context: context,
-        useRootNavigator: false,
-        barrierDismissible: false,
-        builder: (_) => LoadingDialog(key: key),
-      ).then((_) => FocusScope.of(context).requestFocus(FocusNode()));
+// class LoadingDialog extends StatelessWidget {
+//   static void show(BuildContext context, {Key? key}) => showDialog<void>(
+//         context: context,
+//         useRootNavigator: false,
+//         barrierDismissible: false,
+//         builder: (_) => LoadingDialog(key: key),
+//       ).then((_) => FocusScope.of(context).requestFocus(FocusNode()));
 
-  static void hide(BuildContext context) => Navigator.pop(context);
+//   static void hide(BuildContext context) => Navigator.pop(context);
 
-  const LoadingDialog({Key? key}) : super(key: key);
+//   const LoadingDialog({Key? key}) : super(key: key);
 
-  @override
-  Widget build(BuildContext context) {
-    return WillPopScope(
-      onWillPop: () async => false,
-      child: Center(
-        child: Card(
-          child: Container(
-            width: 80,
-            height: 80,
-            padding: const EdgeInsets.all(12.0),
-            // child: const CircularProgressIndicator(),
-          ),
-        ),
-      ),
-    );
-  }
-}
+//   @override
+//   Widget build(BuildContext context) {
+//     return WillPopScope(
+//       onWillPop: () async => false,
+//       child: Center(
+//         child: Card(
+//           child: Container(
+//             width: 80,
+//             height: 80,
+//             padding: const EdgeInsets.all(12.0),
+//             // child: const CircularProgressIndicator(),
+//           ),
+//         ),
+//       ),
+//     );
+//   }
+// }
