@@ -9,7 +9,7 @@ import 'dart:convert';
 
 import 'package:permission_handler/permission_handler.dart';
 
-const apiKey = "AIzaSyCtpQKZE1tWznJ8ciDfT86qrO2-KA4vCvE";
+const apiKey = "appikey_place_holder";
 
 class AppState with ChangeNotifier {
   late LatLng _initialPosition;
