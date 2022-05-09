@@ -8,8 +8,14 @@ import 'package:http/http.dart' as http;
 import 'dart:convert';
 
 import 'package:permission_handler/permission_handler.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:smart_parking_system/services/storage_items.dart';
 
-const apiKey = "AIzaSyCtpQKZE1tWznJ8ciDfT86qrO2-KA4vCvE";
+import '../services/storage.dart';
+
+final SecureStorage secureStorage = SecureStorage();
+
+var apiKey = secureStorage.writeSecureData(api);
 
 class AppState with ChangeNotifier {
   late LatLng _initialPosition;
@@ -18,13 +24,13 @@ class AppState with ChangeNotifier {
   final Set<Marker> _markers = {};
   final Set<Polyline> _polyLines = {};
   // final GoogleMapController _mapController;
-  final GoogleMapsServices _googleMapsServices = GoogleMapsServices();
+  final MapsPolyline _mapsPolylines = MapsPolyline();
   static TextEditingController locationController = TextEditingController();
   static TextEditingController destinationController = TextEditingController();
   CameraPosition get initialPosition =>
       CameraPosition(target: _initialPosition, zoom: 16);
   CameraPosition get lastPosition => initialPosition;
-  GoogleMapsServices get googleMapsServices => _googleMapsServices;
+  MapsPolyline get mapsPolylines => _mapsPolylines;
   late GoogleMapController mapController;
   Set<Marker> get markers => _markers;
   Set<Polyline> get polyLines => _polyLines;
@@ -141,8 +147,8 @@ class AppState with ChangeNotifier {
     List<Location> locations = await locationFromAddress(intendedLocation);
     LatLng destination = LatLng(locations[0].latitude, locations[0].longitude);
     _addMarker(destination, intendedLocation);
-    String route = await _googleMapsServices.getRouteCoordinates(
-        _initialPosition, destination);
+    String route =
+        await _mapsPolylines.getRouteCoordinates(_initialPosition, destination);
     createRoute(route);
     notifyListeners();
   }
@@ -169,11 +175,21 @@ class AppState with ChangeNotifier {
   }
 }
 
-class GoogleMapsServices {
+class MapsPolyline {
   Future<String> getRouteCoordinates(LatLng l1, LatLng l2) async {
-    String url =
+    String urlPolyline =
         "https://maps.googleapis.com/maps/api/directions/json?origin=${l1.latitude},${l1.longitude}&destination=${l2.latitude},${l2.longitude}&key=$apiKey";
-    http.Response response = await http.get(Uri.parse(url));
+    http.Response response = await http.get(Uri.parse(urlPolyline));
+    Map values = jsonDecode(response.body);
+    return values["routes"][0]["overview_polyline"]["points"];
+  }
+}
+
+class MapsLocationRequest {
+  Future<String> getPlaceCoordinates(LatLng l1) async {
+    String urlPlace =
+        "https://maps.googleapis.com/maps/api/geocode/json?latlng=${l1.latitude},${l1.longitude}&region=in&key=$apiKey";
+    http.Response response = await http.get(Uri.parse(urlPlace));
     Map values = jsonDecode(response.body);
     return values["routes"][0]["overview_polyline"]["points"];
   }
