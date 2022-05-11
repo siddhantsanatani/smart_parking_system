@@ -35,8 +35,8 @@ dependencies:
   firebase_auth: ^3.3.14
   firebase_storage: ^10.2.12
   cloud_firestore: ^3.1.13
-  flutter_form_builder: ^7.1.1
-  flutter_form_bloc: ^0.30.1
+#  flutter_form_bloc:
+#    path: lib/externals/flutter_form_bloc-0.30.1/
   uuid: ^3.0.6
   geolocator: ^8.2.0
   rxdart: ^0.27.3
@@ -54,6 +54,11 @@ dependencies:
   getwidget: ^2.0.5
   permission_handler: ^9.2.0
   flutter_secure_storage: ^5.0.2
+  bloc: ^8.0.3
+  equatable: ^2.0.3
+  flutter_bloc: ^8.0.1
+  flutter_keyboard_visibility: ^5.2.0
+  # flutter_bloc: ^8.0.1
 
   
 

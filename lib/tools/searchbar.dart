@@ -10,7 +10,7 @@ class SearchBar extends StatelessWidget {
   final double bottom;
   final double width;
   final double height;
-  TextEditingController searchBarController = TextEditingController();
+  final TextEditingController searchBarController = TextEditingController();
   SearchBar({
     Key? key,
     this.top = 0,
@@ -19,7 +19,7 @@ class SearchBar extends StatelessWidget {
     this.left = 10,
     this.right = 10,
     this.width = double.infinity,
-    // required this.searchBarController
+    //required this.searchBarController
   }) : super(
           key: key,
         );

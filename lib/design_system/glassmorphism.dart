@@ -3,8 +3,6 @@ import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:smart_parking_system/design_system/styles.dart';
 
-import '../tools/widget.dart';
-
 class FrostedAppBar extends StatefulWidget {
   //
   final double? elevation;
@@ -37,7 +35,7 @@ class FrostedAppBar extends StatefulWidget {
 class _FrostedAppBarState extends State<FrostedAppBar> {
   @override
   Widget build(BuildContext context) {
-    var scrSize = MediaQuery.of(context).size;
+    //var scrSize = MediaQuery.of(context).size;
     return ClipRect(
       child: BackdropFilter(
         filter: ImageFilter.blur(

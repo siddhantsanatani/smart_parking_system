@@ -1,10 +1,13 @@
 import 'package:blurry_modal_progress_hud/blurry_modal_progress_hud.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_form_bloc/flutter_form_bloc.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+// import 'package:flutter_form_bloc/flutter_form_bloc.dart';
+//import 'package:smart_parking_system/externals/flutter_form_bloc-0.30.1/lib/flutter_form_bloc.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:getwidget/getwidget.dart';
 import 'package:smart_parking_system/Screens/home.dart';
+import '../externals/flutter_form_bloc-0.30.1/flutter_form_bloc.dart';
 import '/design_system/styles.dart';
 
 class WizardFormLogIn extends StatefulWidget {

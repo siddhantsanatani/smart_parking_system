@@ -10,11 +10,7 @@ class NavigationDrawerWidget extends StatelessWidget {
   const NavigationDrawerWidget({Key? key}) : super(key: key);
   @override
   Widget build(BuildContext context) {
-    const name = 'Sarah Abs';
-    const email = 'sarah@abs.com';
-    const urlImage =
-        'https://images.unsplash.com/photo-1494790108377-be9c29b29330?ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&ixlib=rb-1.2.1&auto=format&fit=crop&w=634&q=80';
-
+    //
     return Drawer(
       child: Material(
         color: AppColors.lightBlue,
@@ -52,7 +48,7 @@ class NavigationDrawerWidget extends StatelessWidget {
                     onClicked: () {},
                   ),
                   const SizedBox(height: 24),
-                  Divider(color: Colors.black),
+                  const Divider(color: Colors.black),
                   const SizedBox(height: 24),
                   buildMenuItem(
                     text: "Support",
@@ -75,15 +71,16 @@ class NavigationDrawerWidget extends StatelessWidget {
   }
 
   Widget buildSearchField() {
-    final color = Colors.white;
+    const color = Colors.white;
 
     return TextField(
-      style: TextStyle(color: color),
+      style: const TextStyle(color: color),
       decoration: InputDecoration(
-        contentPadding: EdgeInsets.symmetric(horizontal: 20, vertical: 15),
+        contentPadding:
+            const EdgeInsets.symmetric(horizontal: 20, vertical: 15),
         hintText: 'Search',
-        hintStyle: TextStyle(color: color),
-        prefixIcon: Icon(Icons.search, color: color),
+        hintStyle: const TextStyle(color: color),
+        prefixIcon: const Icon(Icons.search, color: color),
         filled: true,
         fillColor: Colors.white12,
         enabledBorder: OutlineInputBorder(
