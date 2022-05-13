@@ -3,6 +3,8 @@
 // found in the LICENSE file.
 
 import 'package:flutter/material.dart';
+import 'package:smart_parking_system/design_system/styles.dart';
+import 'package:smart_parking_system/tools/button.dart';
 
 const TextStyle _kStepStyle = TextStyle(
   fontSize: 12.0,
@@ -87,16 +89,20 @@ class Step {
   /// Creates a step for a [Stepper].
   ///
   /// The [title], [content], and [state] arguments must not be null.
-  const Step({
-    required this.title,
-    this.subtitle,
-    required this.content,
-    this.state = StepState.indexed,
-    this.isActive = false,
-  });
+  const Step(
+      {required this.title,
+      this.subtitle,
+      required this.content,
+      this.state = StepState.indexed,
+      this.isActive = false,
+      this.continueButtonLabel,
+      this.cancelButtonLabel});
 
   /// The title of the step that typically describes it.
   final Widget title;
+
+  final String? continueButtonLabel;
+  final String? cancelButtonLabel;
 
   /// The subtitle of the step that appears below the title and has a smaller
   /// font size. It typically gives more details that complement the title.
@@ -138,28 +144,23 @@ class Stepper extends StatefulWidget {
   /// new one.
   ///
   /// The [steps], [type], and [currentStep] arguments must not be null.
-  const Stepper(
-      {Key? key,
-      required this.steps,
-      this.physics,
-      this.type = StepperType.vertical,
-      this.currentStep = 0,
-      this.onStepTapped,
-      this.onStepContinue,
-      this.titleHeight = 66.0,
-      this.onStepCancel,
-      this.controlsBuilder,
-      this.elevation,
-      this.margin,
-      this.continueButtonLabel,
-      this.cancelButtonLabel})
-      : assert(0 <= currentStep && currentStep < steps.length),
+  const Stepper({
+    Key? key,
+    required this.steps,
+    this.physics,
+    this.type = StepperType.vertical,
+    this.currentStep = 0,
+    this.onStepTapped,
+    this.onStepContinue,
+    this.titleHeight = 66.0,
+    this.onStepCancel,
+    this.controlsBuilder,
+    this.elevation,
+    this.margin,
+  })  : assert(0 <= currentStep && currentStep < steps.length),
         super(key: key);
 
   /// The title of the step that typically describes it.
-
-  final String? continueButtonLabel;
-  final String? cancelButtonLabel;
 
   /// The steps of the stepper whose titles, subtitles, icons always get shown.
   ///
@@ -439,24 +440,8 @@ class _StepperState extends State<Stepper> with TickerProviderStateMixin {
       );
     }
 
-    final Color cancelColor;
-    switch (Theme.of(context).brightness) {
-      case Brightness.light:
-        cancelColor = Colors.black54;
-        break;
-      case Brightness.dark:
-        cancelColor = Colors.white70;
-        break;
-    }
-
-    final ThemeData themeData = Theme.of(context);
-    final ColorScheme colorScheme = themeData.colorScheme;
     final MaterialLocalizations localizations =
         MaterialLocalizations.of(context);
-
-    const OutlinedBorder buttonShape = RoundedRectangleBorder(
-        borderRadius: BorderRadius.all(Radius.circular(2)));
-    const EdgeInsets buttonPadding = EdgeInsets.symmetric(horizontal: 16.0);
 
     return Container(
       margin: const EdgeInsets.only(top: 16.0),
@@ -467,41 +452,23 @@ class _StepperState extends State<Stepper> with TickerProviderStateMixin {
           // and cancel button styles have been configured to match the original
           // version of this widget.
           children: <Widget>[
-            TextButton(
-              onPressed: widget.onStepContinue,
-              style: ButtonStyle(
-                foregroundColor: MaterialStateProperty.resolveWith<Color?>(
-                    (Set<MaterialState> states) {
-                  return states.contains(MaterialState.disabled)
-                      ? null
-                      : (_isDark()
-                          ? colorScheme.onSurface
-                          : colorScheme.onPrimary);
-                }),
-                backgroundColor: MaterialStateProperty.resolveWith<Color?>(
-                    (Set<MaterialState> states) {
-                  return _isDark() || states.contains(MaterialState.disabled)
-                      ? null
-                      : colorScheme.primary;
-                }),
-                padding: MaterialStateProperty.all<EdgeInsetsGeometry>(
-                    buttonPadding),
-                shape: MaterialStateProperty.all<OutlinedBorder>(buttonShape),
-              ),
-              child: Text(widget.continueButtonLabel ??
-                  localizations.continueButtonLabel),
-            ),
+            AppButtonStyle(
+                buttonTextColor: AppColors.white2,
+                action: widget.onStepCancel,
+                buttonText: widget.steps[stepIndex].continueButtonLabel != null
+                    ? widget.steps[stepIndex].continueButtonLabel!
+                    : localizations.continueButtonLabel,
+                buttonWidth: 124),
             Container(
-              margin: const EdgeInsetsDirectional.only(start: 8.0),
-              child: TextButton(
-                onPressed: widget.onStepCancel,
-                style: TextButton.styleFrom(
-                  primary: cancelColor,
-                  padding: buttonPadding,
-                  shape: buttonShape,
-                ),
-                child: Text(widget.cancelButtonLabel ??
-                    localizations.cancelButtonLabel),
+              margin: const EdgeInsetsDirectional.only(start: 14.0),
+              child: AppButtonStyle(
+                buttonBgColor: AppColors.white,
+                buttonTextColor: AppColors.darkNavy,
+                action: widget.onStepCancel,
+                buttonText: widget.steps[stepIndex].cancelButtonLabel != null
+                    ? widget.steps[stepIndex].cancelButtonLabel!
+                    : localizations.cancelButtonLabel,
+                buttonWidth: 84,
               ),
             ),
           ],

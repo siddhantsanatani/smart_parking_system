@@ -107,54 +107,6 @@ class StepperFormBlocBuilder<T extends FormBloc> extends StatelessWidget {
   /// If null, the 'cancel' button will call [FormBloc.previousStep]
   final void Function(FormBloc? formBloc)? onStepCancel;
 
-  /// The callback for creating custom controls.
-  ///
-  /// If null, the default controls from the current theme will be used.
-  ///
-  /// This callback which takes in a context and two functions,[onStepContinue]
-  /// and [onStepCancel]. These can be used to control the stepper.
-  ///
-  /// {@tool dartpad --template=stateless_widget_scaffold}
-  /// Creates a stepper control with custom buttons.
-  ///
-  /// ```dart
-  /// Widget build(BuildContext context) {
-  ///   return Stepper(
-  ///     controlsBuilder:
-  ///       (BuildContext context, int step, VoidCallback onStepContinue, VoidCallback onStepCancel, FormBloc formBloc) {
-  ///          return Row(
-  ///            children: <Widget>[
-  ///              FlatButton(
-  ///                onPressed: onStepContinue,
-  ///                child: const Text('NEXT'),
-  ///              ),
-  ///              FlatButton(
-  ///                onPressed: onStepCancel,
-  ///                child: const Text('CANCEL'),
-  ///              ),
-  ///            ],
-  ///          );
-  ///       },
-  ///     steps: const <Step>[
-  ///       Step(
-  ///         title: Text('A'),
-  ///         content: SizedBox(
-  ///           width: 100.0,
-  ///           height: 100.0,
-  ///         ),
-  ///       ),
-  ///       Step(
-  ///         title: Text('B'),
-  ///         content: SizedBox(
-  ///           width: 100.0,
-  ///           height: 100.0,
-  ///         ),
-  ///       ),
-  ///     ],
-  ///   );
-  /// }
-  /// ```
-  /// {@end-tool}
   final Widget Function(
     BuildContext context,
     VoidCallback? onStepContinue,
@@ -194,7 +146,9 @@ class StepperFormBlocBuilder<T extends FormBloc> extends StatelessWidget {
                   isActive: formBlocSteps[i].isActive ?? i == state.currentStep,
                   content: formBlocSteps[i].content,
                   state: formBlocSteps[i].state,
-                  subtitle: formBlocSteps[i].subtitle)
+                  subtitle: formBlocSteps[i].subtitle,
+                  continueButtonLabel: formBlocSteps[i].continueButtonLabel,
+                  cancelButtonLabel: formBlocSteps[i].cancelButtonLabel)
           ],
           controlsBuilder: controlsBuilder == null
               ? null
