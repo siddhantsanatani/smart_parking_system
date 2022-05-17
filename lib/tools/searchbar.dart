@@ -1,9 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:smart_parking_system/tools/bottomDrawer.dart';
 import '/design_system/styles.dart';
-import 'mapstate.dart';
+import '../handler/mapfunctions.dart';
 
-class SearchBar extends StatelessWidget {
+enum SearchBarState { onTapped, onTyped, onComplete, defult }
+
+// ignore: must_be_immutable
+class SearchBar extends StatelessWidget with ChangeNotifier {
   final double top;
   final double left;
   final double right;
@@ -11,6 +15,7 @@ class SearchBar extends StatelessWidget {
   final double width;
   final double height;
   final TextEditingController searchBarController = TextEditingController();
+  SearchBarState searchBarState = SearchBarState.defult;
   SearchBar({
     Key? key,
     this.top = 0,
@@ -26,12 +31,9 @@ class SearchBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final appState = Provider.of<AppState>(context);
-    return Container(
-      alignment: Alignment.bottomCenter,
-      margin: EdgeInsets.fromLTRB(left, top, right, bottom),
-      width: width,
-      height: height,
+    final appState = Provider.of<MapFunctions>(context);
+    return Padding(
+      padding: EdgeInsets.fromLTRB(left, top, right, bottom),
       child: Row(
         children: [
           Expanded(
@@ -39,6 +41,7 @@ class SearchBar extends StatelessWidget {
               controller: searchBarController,
               textInputAction: TextInputAction.search,
               decoration: InputDecoration(
+                constraints: BoxConstraints.tight(Size(width, height)),
                 prefixIcon: Container(
                   width: 48,
                   height: 48,
@@ -63,8 +66,18 @@ class SearchBar extends StatelessWidget {
                   color: AppColors.dark,
                 ),
               ),
+              onTap: () {
+                searchBarState = SearchBarState.onTapped;
+                notifyListeners();
+              },
               onEditingComplete: () {
+                searchBarState = SearchBarState.onComplete;
                 appState.sendDestinationRequest(searchBarController.text);
+                notifyListeners();
+              },
+              onChanged: (text) {
+                searchBarState = SearchBarState.onTyped;
+                notifyListeners();
               },
               onFieldSubmitted: (text) {
                 appState.sendDestinationRequest(text);

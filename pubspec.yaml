@@ -58,6 +58,7 @@ dependencies:
   equatable: ^2.0.3
   flutter_bloc: ^8.0.1
   flutter_keyboard_visibility: ^5.2.0
+  flutter_polyline_points: ^1.0.0
   # flutter_bloc: ^8.0.1
 
   

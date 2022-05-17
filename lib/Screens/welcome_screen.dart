@@ -37,7 +37,7 @@ class _WelcomeScreen extends State<WelcomeScreen>
     controller.addStatusListener((status) {
       // setState(() {});
       if (controller.isCompleted) {
-        Navigator.pushReplacementNamed(context, HomeScreen.id);
+        Navigator.popAndPushNamed(context, HomeScreen.id);
       }
     });
     // animation = TimelineTween<AnimProps>()

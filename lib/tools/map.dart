@@ -4,7 +4,7 @@ import 'package:google_maps_flutter/google_maps_flutter.dart';
 //import 'package:smart_parking_system/externals/form_bloc-0.30.0/lib/form_bloc.dart';
 
 import '../externals/form_bloc-0.30.0/form_bloc.dart';
-import 'mapstate.dart';
+import '../handler/mapfunctions.dart';
 
 class AppMap extends StatefulWidget {
   const AppMap({Key? key}) : super(key: key);
@@ -14,30 +14,27 @@ class AppMap extends StatefulWidget {
 }
 
 class _AppMap extends State<AppMap> {
-  // final appState = AppState();
   final destination = TextFieldBloc();
+  MapFunctions mapFunction = MapFunctions();
+  //final Completer<GoogleMapController> _mapController = Completer();
   // late GoogleMapController mapController;
   // late CameraPosition lastPosition;
-  // final Set<Marker> _markers = {};
 
   @override
   Widget build(BuildContext context) {
-    final appState = Provider.of<AppState>(context);
-    // lastPosition = appState.lastPosition;
+    mapFunction = Provider.of<MapFunctions>(context);
     return SafeArea(
       child: GoogleMap(
-        initialCameraPosition: appState.lastPosition,
+        initialCameraPosition: mapFunction.lastPosition,
         myLocationEnabled: true,
         myLocationButtonEnabled: false,
         mapType: MapType.normal,
         compassEnabled: true,
         minMaxZoomPreference: const MinMaxZoomPreference(10, 20),
-        onMapCreated: (GoogleMapController controller) {
-          appState.mapController = controller;
-        },
-        markers: appState.markers,
-        onCameraMove: appState.onCameraMove,
-        polylines: appState.polyLines,
+        onMapCreated: mapFunction.onCreated,
+        markers: mapFunction.markers,
+        onCameraMove: mapFunction.onCameraMove,
+        polylines: mapFunction.polyLines,
       ),
     );
   }
@@ -54,17 +51,4 @@ class _AppMap extends State<AppMap> {
   //   });
   // }
 
-  // void _onAddMarkerPressed() {
-  //   setState(() {
-  //     _markers.add(
-  //       Marker(
-  //           markerId: MarkerId(lastPosition.toString()),
-  //           position: LatLng(
-  //               lastPosition.target.latitude, lastPosition.target.longitude),
-  //           infoWindow:
-  //               const InfoWindow(title: 'Your Location', snippet: 'Park'),
-  //           icon: BitmapDescriptor.defaultMarker),
-  //     );
-  //   });
-  // }
 }

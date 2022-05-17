@@ -2,12 +2,15 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:smart_parking_system/Screens/welcome_screen.dart';
-import 'package:smart_parking_system/tools/mapstate.dart';
+import 'package:smart_parking_system/handler/mapfunctions.dart';
+import 'package:smart_parking_system/tools/bottomDrawer.dart';
+import 'package:smart_parking_system/tools/searchbar.dart';
 import 'Screens/success_screen.dart';
-import '../tools/mapstate.dart';
+import 'handler/mapfunctions.dart';
 import 'Screens/login_screen.dart';
 import 'Screens/home.dart';
 import 'Screens/registration_screen.dart';
+import 'handler/appdata.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -15,11 +18,14 @@ Future<void> main() async {
   runApp(
     MultiProvider(
       providers: [
-        // Provider<AppState>(create: (_) => AppState()),
+        Provider<AppData>(create: (_) => AppData()),
         ChangeNotifierProvider.value(
-          value: AppState(),
+          value: MapFunctions(),
+        ),
+        ChangeNotifierProvider.value(
+          value: SearchBar(),
         )
-        // Provider<SomethingElse>(create: (_) => SomethingElse()),
+        // Provider<SearchBar>(create: (_) => SearchBar()),
         // Provider<AnotherThing>(create: (_) => AnotherThing()),
       ],
       child: MaterialApp(
@@ -34,22 +40,22 @@ Future<void> main() async {
           WelcomeScreen.id: (context) => const WelcomeScreen(),
         },
         initialRoute: WelcomeScreen.id,
-        home: const Home(),
+        home: const HomeScreen(),
       ),
     ),
   );
 }
 
-class Home extends StatefulWidget {
-  const Home({Key? key}) : super(key: key);
+// class Home extends StatefulWidget {
+//   const Home({Key? key}) : super(key: key);
 
-  @override
-  _HomeState createState() => _HomeState();
-}
+//   @override
+//   _HomeState createState() => _HomeState();
+// }
 
-class _HomeState extends State<Home> {
-  @override
-  Widget build(BuildContext context) {
-    return const HomeScreen();
-  }
-}
+// class _HomeState extends State<Home> {
+//   @override
+//   Widget build(BuildContext context) {
+//     return const HomeScreen();
+//   }
+// }

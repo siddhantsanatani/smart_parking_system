@@ -5,21 +5,30 @@ import 'package:geocoding/geocoding.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
+import 'package:flutter_polyline_points/flutter_polyline_points.dart';
 import 'package:permission_handler/permission_handler.dart';
-import 'package:smart_parking_system/services/storage_items.dart';
-import '../services/storage.dart';
+import 'package:provider/provider.dart';
+import 'package:smart_parking_system/dataStorage/storage_items.dart';
+import 'package:smart_parking_system/dataStorage/userAddress.dart';
+import 'package:smart_parking_system/handler/appdata.dart';
+import '../dataStorage/storage.dart';
 
 SecureStorage locker = SecureStorage();
 final apiKeyWrite = locker.writeSecureData(api);
 final apiKeyRead = locker.readSecureData('API');
 
-class AppState with ChangeNotifier {
-  late LatLng _initialPosition;
+class MapFunctions with ChangeNotifier {
+  MapFunctions() {
+    getUserLocation().then((value) => _initialPosition = value);
+  }
+  LatLng _initialPosition = const LatLng(22.2604, 84.8536);
+  // late LatLng _initialPosition;
   late LatLng _lastPosition = _initialPosition;
   bool locationServiceActive = true;
   final Set<Marker> _markers = {};
   final Set<Polyline> _polyLines = {};
-  // final GoogleMapController _mapController;
+  final Completer<GoogleMapController> _mapController =
+      Completer<GoogleMapController>();
   final MapsPolyline _mapsPolylines = MapsPolyline();
   static TextEditingController locationController = TextEditingController();
   static TextEditingController destinationController = TextEditingController();
@@ -30,32 +39,41 @@ class AppState with ChangeNotifier {
   late GoogleMapController mapController;
   Set<Marker> get markers => _markers;
   Set<Polyline> get polyLines => _polyLines;
-
-  AppState() {
-    getUserLocation();
-  }
+  late UserAddress userAddress = UserAddress(
+      pFormattedAddress: locationController.text,
+      latitude: _lastPosition.latitude,
+      longitude: _lastPosition.longitude);
 
 // ! TO GET THE USERS LOCATION
-  void getUserLocation() async {
+  Future<LatLng> getUserLocation() async {
+    await Geolocator.requestPermission()
+        .then((value) => null)
+        .onError((error, stackTrace) {
+      print("error" + error.toString());
+    });
     try {
       if (await Permission.location.request().isGranted) {
-        print("GET USER METHOD RUNNING =========");
-        Position position = await Geolocator.getCurrentPosition(
-            desiredAccuracy: LocationAccuracy.best);
-        _initialPosition = LatLng(position.latitude, position.longitude);
-        notifyListeners();
-      } else {
         Position position = await Geolocator.getCurrentPosition(
             desiredAccuracy: LocationAccuracy.best);
         _initialPosition = LatLng(position.latitude, position.longitude);
         List<Placemark> placemark = await placemarkFromCoordinates(
             position.latitude, position.longitude);
         locationController.text = placemark[0].name!;
+        addMarker(
+          location: _initialPosition,
+          title: placemark[0].name!,
+        );
         notifyListeners();
       }
     } catch (error) {
       print(error.toString());
     }
+    return _initialPosition;
+  }
+
+  Future<void> _disposeController() async {
+    final GoogleMapController mapController = await _mapController.future;
+    mapController.dispose();
   }
 
   // ! TO CREATE ROUTE
@@ -69,12 +87,16 @@ class AppState with ChangeNotifier {
   }
 
   // ! ADD A MARKER ON THE MAO
-  void _addMarker(LatLng location, String address) {
+  void addMarker(
+      {required LatLng location,
+      required String title,
+      BitmapDescriptor? icon}) {
     _markers.add(Marker(
         markerId: MarkerId(_lastPosition.toString()),
         position: location,
-        infoWindow: InfoWindow(title: address, snippet: "go here"),
-        icon: BitmapDescriptor.defaultMarker));
+        infoWindow: InfoWindow(title: title /*snippet: "go here"*/
+            ),
+        icon: icon ?? BitmapDescriptor.defaultMarker));
     notifyListeners();
   }
 
@@ -139,15 +161,15 @@ class AppState with ChangeNotifier {
   }
 
   // ! SEND Polyline REQUEST
-  void sendPolyLineRequest(String intendedLocation) async {
-    List<Location> locations = await locationFromAddress(intendedLocation);
-    LatLng destination = LatLng(locations[0].latitude, locations[0].longitude);
-    _addMarker(destination, intendedLocation);
-    String route =
-        await _mapsPolylines.getRouteCoordinates(_initialPosition, destination);
-    createRoute(route);
-    notifyListeners();
-  }
+  // void sendPolyLineRequest(String intendedLocation) async {
+  //   List<Location> locations = await locationFromAddress(intendedLocation);
+  //   LatLng destination = LatLng(locations[0].latitude, locations[0].longitude);
+  //   _addMarker(destination, intendedLocation);
+  //   String route =
+  //       await _mapsPolylines.getRouteCoordinates(_initialPosition, destination);
+  //   createRoute(route);
+  //   notifyListeners();
+  // }
 
   // ! ON CAMERA MOVE
   void onCameraMove(CameraPosition position) {
@@ -156,17 +178,17 @@ class AppState with ChangeNotifier {
   }
 
   // ! ON CREATE
-  void onCreated(GoogleMapController controller) {
-    // _mapController.complete(controller);
-    mapController = controller;
-    mapController
-        .animateCamera(CameraUpdate.newCameraPosition(initialPosition));
+  void onCreated(GoogleMapController controller) async {
+    _mapController.complete(controller);
+    mapController = await _mapController.future;
+    addMarker(location: _lastPosition, title: userAddress.pFormattedAddress);
+    mapController.animateCamera(CameraUpdate.newCameraPosition(lastPosition));
     notifyListeners();
   }
 
   @override
   void dispose() {
-    mapController.dispose();
+    _disposeController();
     super.dispose();
   }
 }
@@ -181,22 +203,51 @@ class MapsPolyline {
   }
 }
 
-class MapsLocationRequest {
-  Future<String> getPlaceCoordinates(LatLng l1) async {
+class LocationGeocodeRequest {
+  static Future<dynamic> locationGeocodeRequest(String urlPlace) async {
+    try {
+      http.Response response = await http.get(Uri.parse(urlPlace));
+      Map values = jsonDecode(response.body);
+      return values;
+    } catch (e) {
+      return "failed";
+    }
+  }
+}
+
+class LocationReverseGeocodeRequest {
+  Future<String> locationReverseGeocodeRequest(
+      LatLng l1, BuildContext context) async {
     String urlPlace =
         "https://maps.googleapis.com/maps/api/geocode/json?latlng=${l1.latitude},${l1.longitude}&region=in&key=$apiKeyRead";
-    http.Response response = await http.get(Uri.parse(urlPlace));
-    Map values = jsonDecode(response.body);
-    return values["routes"][0]["overview_polyline"]["points"];
+    Map values = await LocationGeocodeRequest.locationGeocodeRequest(urlPlace);
+
+    UserAddress userAddress = UserAddress(
+        pFormattedAddress: values["results"][0]["formatted_address"],
+        latitude: l1.latitude,
+        longitude: l1.longitude);
+    Provider.of<AppData>(context, listen: false)
+        .updateUserLocation(userAddress);
+    return values["results"][0]["formatted_address"];
   }
 }
 
 class GoogleMapsServices {
-  Future<String> getRouteCoordinates(LatLng l1, LatLng l2) async {
+  Future<Map<String, dynamic>> getDirections(LatLng l1, LatLng l2) async {
     String url =
         "https://maps.googleapis.com/maps/api/directions/json?origin=${l1.latitude},${l1.longitude}&destination=${l2.latitude},${l2.longitude}&key=$apiKeyRead";
     http.Response response = await http.get(Uri.parse(url));
     Map values = jsonDecode(response.body);
-    return values["routes"][0]["overview_polyline"]["points"];
+    var results = {
+      'bounds_ne': values['routes'][0]['bounds']['northeast'],
+      'bounds_sw': values['routes'][0]['bounds']['southwest'],
+      'start_location': values['routes'][0]['legs'][0]['start_location'],
+      'end_location': values['routes'][0]['legs'][0]['end_location'],
+      'polyline': values['routes'][0]['overview_polyline']['points'],
+      'polyline_decoded': PolylinePoints()
+          .decodePolyline(values['routes'][0]['overview_polyline']['points']),
+    };
+
+    return results;
   }
 }

@@ -1,11 +1,13 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:provider/provider.dart';
+import 'package:smart_parking_system/handler/mapfunctions.dart';
+import 'package:smart_parking_system/tools/bottomDrawer.dart';
 import 'package:smart_parking_system/tools/widget.dart';
 import '../design_system/glassmorphism.dart';
 import '../tools/map.dart';
 import '/design_system/styles.dart';
-import 'package:smart_parking_system/tools/card.dart';
-
 import 'navigation_drawer.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -39,7 +41,7 @@ class _HomeScreen extends State<HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
-    // final appState = Provider.of<AppState>(context);
+    final appState = Provider.of<MapFunctions>(context);
     var scrSize = MediaQuery.of(context).size;
     return Scaffold(
       extendBodyBehindAppBar: true,
@@ -125,28 +127,42 @@ class _HomeScreen extends State<HomeScreen> {
             //   ),
             // ),
             Column(
+              // alignment: AlignmentDirectional.bottomCenter,
               mainAxisAlignment: MainAxisAlignment.end,
               crossAxisAlignment: CrossAxisAlignment.end,
               children: [
                 Container(
+                  // width: scrSize.width,
+                  // height: 150,
                   padding: const EdgeInsets.only(right: 30),
-                  child: FloatingActionButton(
-                      onPressed: () {},
-                      tooltip: 'Add Marker',
-                      backgroundColor: AppColors.appBlue,
-                      child: const Icon(
-                        Icons.add_location,
-                        color: AppColors.light,
-                      )),
+                  alignment: Alignment.topRight,
+                  child: SizedBox(
+                    height: 50,
+                    width: 50,
+                    child: FloatingActionButton(
+                        onPressed: () {
+                          appState.getUserLocation();
+                          setState(() {
+                            appState.onCreated;
+                            appState.mapController.animateCamera(
+                                CameraUpdate.newCameraPosition(
+                                    appState.lastPosition));
+                          });
+                        },
+                        tooltip: 'My location',
+                        backgroundColor: AppColors.appBlue,
+                        child: const Icon(
+                          Icons.add_location,
+                          color: AppColors.light,
+                        )),
+                  ),
                 ),
                 const SizedBox(
                   height: 20,
                 ),
-                const SizedBox(
-                  height: 110,
-                  child: AppCard(
-                    searchBarAtDown: true,
-                  ),
+                const BottomDrawer(
+                  //length: DrawerLength.defult,
+                  searchBarAtDown: true,
                 ),
               ],
             ),

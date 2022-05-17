@@ -57,7 +57,8 @@ class AppCard extends StatelessWidget {
 
   Widget searchBox(searchBarAtDown) {
     if (searchBarAtDown) {
-      return SearchBar(top: 20);
+      return const SizedBox();
+      //SearchBar(top: 20);
     } else {
       return const SizedBox();
     }
