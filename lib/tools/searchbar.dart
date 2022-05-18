@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:smart_parking_system/Screens/success_screen.dart';
-import 'package:smart_parking_system/tools/bottomDrawer.dart';
+import 'package:smart_parking_system/tools/bottom_drawer.dart';
 import '/design_system/styles.dart';
 import '../handler/mapfunctions.dart';
 

@@ -1,7 +1,7 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:smart_parking_system/Screens/searchScreen.dart';
+import 'package:smart_parking_system/Screens/search_screen.dart';
 import 'package:smart_parking_system/Screens/welcome_screen.dart';
 import 'package:smart_parking_system/handler/mapfunctions.dart';
 import 'package:smart_parking_system/tools/searchbar.dart';
