@@ -160,9 +160,9 @@ class _WizardFormState extends State<WizardFormReg> {
                                     'vehicleNumber': vehicleNumber,
                                     // 'dob': dob // 42
                                   })
-                                  .then((value) => print("User Added"))
-                                  .onError((error, stackTrace) =>
-                                      print("Failed to add user: $error"));
+                                  .then((value) => {}) //print("User Added"))
+                                  .onError((error, stackTrace) => {});
+                              //print("Failed to add user: $error"));
                               Navigator.pushNamed(context, SuccessScreen.id);
                               setState(() {
                                 showSpinner = false;
@@ -318,7 +318,7 @@ class _WizardFormState extends State<WizardFormReg> {
             ),
             onChanged: (value) {
               selectIdCard = value!;
-              print(selectIdCard);
+              //print(selectIdCard);
             },
             itemBuilder: (context, value) => FieldItem(
               child: Label(

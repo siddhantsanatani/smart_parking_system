@@ -72,14 +72,10 @@ class BuildUser extends StatefulWidget {
 
     switch (index) {
       case 0:
-        Navigator.of(context).push(MaterialPageRoute(
-          builder: (context) => const WizardFormLogIn(),
-        ));
+        Navigator.pushNamed(context, WizardFormLogIn.id);
         break;
       case 1:
-        Navigator.of(context).push(MaterialPageRoute(
-          builder: (context) => const WizardFormReg(),
-        ));
+        Navigator.pushNamed(context, WizardFormReg.id);
         break;
     }
   }

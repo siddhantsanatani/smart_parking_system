@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import '/design_system/styles.dart';
-import 'searchbar.dart';
+//import 'searchbar.dart';
 
 class AppCard extends StatelessWidget {
   final Widget? elements;

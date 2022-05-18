@@ -46,34 +46,9 @@ class _FrostedAppBarState extends State<FrostedAppBar> {
         child: AppBar(
           elevation: widget.elevation ?? 0,
           centerTitle: true,
-          actions: widget.actions ??
-              [
-                // const SizedBox(width: 50),
-                Container(
-                  height: 50,
-                  margin: const EdgeInsets.only(right: 15.0),
-                  decoration: BoxDecoration(
-                      color: AppColors.mapLight.withOpacity(0.4),
-                      borderRadius:
-                          const BorderRadius.all(Radius.circular(56))),
-                  child: IconButton(
-                    color: AppColors.dark,
-                    icon: const Icon(
-                      Icons.notifications_rounded,
-                    ),
-                    onPressed: () {
-                      // do something
-                    },
-                  ),
-                ),
-              ],
+          actions: widget.actions,
           title: widget.logo,
           leadingWidth: 70,
-          // shape: const RoundedRectangleBorder(
-          //   borderRadius: BorderRadius.all(
-          //     Radius.circular(30),
-          //   ),
-          // ),
           backgroundColor: AppColors.white.withOpacity(0.5),
           leading: Container(
             height: 50,

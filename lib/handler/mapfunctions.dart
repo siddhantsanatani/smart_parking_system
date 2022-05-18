@@ -9,7 +9,7 @@ import 'package:flutter_polyline_points/flutter_polyline_points.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:provider/provider.dart';
 import 'package:smart_parking_system/dataStorage/storage_items.dart';
-import 'package:smart_parking_system/dataStorage/userAddress.dart';
+import 'package:smart_parking_system/dataStorage/user_address.dart';
 import 'package:smart_parking_system/handler/appdata.dart';
 import '../dataStorage/storage.dart';
 
@@ -19,7 +19,7 @@ final apiKeyRead = locker.readSecureData('API');
 
 class MapFunctions with ChangeNotifier {
   MapFunctions() {
-    getUserLocation().then((value) => _initialPosition = value);
+    getCurrentLocation().then((value) => _initialPosition = value);
   }
   LatLng _initialPosition = const LatLng(22.2604, 84.8536);
   // late LatLng _initialPosition;
@@ -29,6 +29,7 @@ class MapFunctions with ChangeNotifier {
   final Set<Polyline> _polyLines = {};
   final Completer<GoogleMapController> _mapController =
       Completer<GoogleMapController>();
+  Position? position;
   final MapsPolyline _mapsPolylines = MapsPolyline();
   static TextEditingController locationController = TextEditingController();
   static TextEditingController destinationController = TextEditingController();
@@ -45,19 +46,19 @@ class MapFunctions with ChangeNotifier {
       longitude: _lastPosition.longitude);
 
 // ! TO GET THE USERS LOCATION
-  Future<LatLng> getUserLocation() async {
+  Future<LatLng> getCurrentLocation() async {
     await Geolocator.requestPermission()
         .then((value) => null)
         .onError((error, stackTrace) {
-      print("error" + error.toString());
+      //print("error" + error.toString());
     });
     try {
       if (await Permission.location.request().isGranted) {
-        Position position = await Geolocator.getCurrentPosition(
+        position = await Geolocator.getCurrentPosition(
             desiredAccuracy: LocationAccuracy.best);
-        _initialPosition = LatLng(position.latitude, position.longitude);
+        _initialPosition = LatLng(position!.latitude, position!.longitude);
         List<Placemark> placemark = await placemarkFromCoordinates(
-            position.latitude, position.longitude);
+            position!.latitude, position!.longitude);
         locationController.text = placemark[0].name!;
         addMarker(
           location: _initialPosition,
@@ -66,7 +67,7 @@ class MapFunctions with ChangeNotifier {
         notifyListeners();
       }
     } catch (error) {
-      print(error.toString());
+      //print(error.toString());
     }
     return _initialPosition;
   }
@@ -143,7 +144,7 @@ class MapFunctions with ChangeNotifier {
       lList[i] += lList[i - 2];
     }
 
-    print(lList.toString());
+    //print(lList.toString());
 
     return lList;
   }

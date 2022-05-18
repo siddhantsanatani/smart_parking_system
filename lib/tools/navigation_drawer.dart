@@ -21,27 +21,27 @@ class NavigationDrawerWidget extends StatelessWidget {
               padding: padding,
               child: Column(
                 children: [
-                  // const SizedBox(height: 12),
-                  // buildSearchField(),
                   const SizedBox(height: 24),
+                  buildSearchField(),
+                  const SizedBox(height: 12),
                   buildMenuItem(
                     text: "Nearby",
                     icon: Icons.car_repair,
                     onClicked: () {},
                   ),
-                  const SizedBox(height: 16),
+                  const SizedBox(height: 12),
                   buildMenuItem(
                     text: "Saved",
                     icon: Icons.location_on,
                     onClicked: () {},
                   ),
-                  const SizedBox(height: 16),
+                  const SizedBox(height: 12),
                   buildMenuItem(
                     text: "History",
                     icon: Icons.history,
                     onClicked: () {},
                   ),
-                  const SizedBox(height: 16),
+                  const SizedBox(height: 12),
                   buildMenuItem(
                     text: "Payment",
                     icon: Icons.payment,
@@ -84,11 +84,11 @@ class NavigationDrawerWidget extends StatelessWidget {
         filled: true,
         fillColor: Colors.white12,
         enabledBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(5),
+          borderRadius: BorderRadius.circular(25),
           borderSide: BorderSide(color: color.withOpacity(0.7)),
         ),
         focusedBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(5),
+          borderRadius: BorderRadius.circular(25),
           borderSide: BorderSide(color: color.withOpacity(0.7)),
         ),
       ),
@@ -116,14 +116,10 @@ class NavigationDrawerWidget extends StatelessWidget {
 
     switch (index) {
       case 0:
-        Navigator.of(context).push(MaterialPageRoute(
-          builder: (context) => const WizardFormLogIn(),
-        ));
+        Navigator.pushNamed(context, WizardFormLogIn.id);
         break;
       case 1:
-        Navigator.of(context).push(MaterialPageRoute(
-          builder: (context) => const WizardFormReg(),
-        ));
+        Navigator.pushNamed(context, WizardFormReg.id);
         break;
     }
   }

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:smart_parking_system/Screens/success_screen.dart';
 import 'package:smart_parking_system/tools/bottomDrawer.dart';
 import '/design_system/styles.dart';
 import '../handler/mapfunctions.dart';
@@ -67,7 +68,10 @@ class SearchBar extends StatelessWidget with ChangeNotifier {
                 ),
               ),
               onTap: () {
+                Navigator.pushNamed(context, SuccessScreen.id);
                 searchBarState = SearchBarState.onTapped;
+                const BottomDrawer(
+                    searchBarAtDown: true, length: DrawerLength.mid);
                 notifyListeners();
               },
               onEditingComplete: () {
@@ -75,10 +79,10 @@ class SearchBar extends StatelessWidget with ChangeNotifier {
                 appState.sendDestinationRequest(searchBarController.text);
                 notifyListeners();
               },
-              onChanged: (text) {
-                searchBarState = SearchBarState.onTyped;
-                notifyListeners();
-              },
+              // onChanged: (text) {
+              //   searchBarState = SearchBarState.onTyped;
+              //   notifyListeners();
+              // },
               onFieldSubmitted: (text) {
                 appState.sendDestinationRequest(text);
               },

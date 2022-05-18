@@ -32,7 +32,7 @@ class _AppMap extends State<AppMap> {
         compassEnabled: true,
         minMaxZoomPreference: const MinMaxZoomPreference(10, 20),
         onMapCreated: mapFunction.onCreated,
-        markers: mapFunction.markers,
+        markers: Set<Marker>.of(mapFunction.markers),
         onCameraMove: mapFunction.onCameraMove,
         polylines: mapFunction.polyLines,
       ),

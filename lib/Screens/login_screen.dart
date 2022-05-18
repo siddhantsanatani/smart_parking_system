@@ -133,7 +133,7 @@ class _WizardFormLogInState extends State<WizardFormLogIn> {
                                   showSpinner = false;
                                 });
                               } catch (e) {
-                                print(e);
+                                //print(e);
                               }
                             }
                           },

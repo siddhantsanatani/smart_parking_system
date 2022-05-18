@@ -4,11 +4,10 @@ import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:provider/provider.dart';
 import 'package:smart_parking_system/handler/mapfunctions.dart';
 import 'package:smart_parking_system/tools/bottomDrawer.dart';
-import 'package:smart_parking_system/tools/widget.dart';
 import '../design_system/glassmorphism.dart';
 import '../tools/map.dart';
 import '/design_system/styles.dart';
-import 'navigation_drawer.dart';
+import '../tools/navigation_drawer.dart';
 
 class HomeScreen extends StatefulWidget {
   static String id = 'home_screen';
@@ -35,7 +34,7 @@ class _HomeScreen extends State<HomeScreen> {
         loggedInUser = user;
       }
     } catch (e) {
-      print(e);
+      //print(e);
     }
   }
 
@@ -46,28 +45,34 @@ class _HomeScreen extends State<HomeScreen> {
     return Scaffold(
       extendBodyBehindAppBar: true,
       appBar: PreferredSize(
-        preferredSize: Size(scrSize.width, 50),
+        preferredSize: Size(scrSize.width, 60),
         child: FrostedAppBar(
           elevation: 10,
           icon: const Icon(
-            MyFlutterApp.menu,
+            Icons.menu_rounded,
             size: 28,
           ),
           actions: [
             Container(
-              height: 50,
+              // width: 48,
+              // height: 48,
               margin: const EdgeInsets.only(right: 15.0),
               decoration: BoxDecoration(
                   color: AppColors.mapLight.withOpacity(0.4),
                   borderRadius: const BorderRadius.all(Radius.circular(56))),
-              child: IconButton(
-                color: AppColors.dark,
-                icon: const Icon(
-                  Icons.notifications_rounded,
+              child: SizedBox(
+                width: 56,
+                child: IconButton(
+                  padding: const EdgeInsets.all(0),
+                  color: AppColors.dark,
+                  //iconSize: 20,
+                  icon: const Icon(
+                    Icons.notifications_rounded,
+                  ),
+                  onPressed: () {
+                    // do something
+                  },
                 ),
-                onPressed: () {
-                  // do something
-                },
               ),
             ),
           ],
@@ -79,96 +84,56 @@ class _HomeScreen extends State<HomeScreen> {
         ),
       ),
       drawer: const NavigationDrawerWidget(),
-      body: SafeArea(
-        child: Stack(
-          children: [
-            const AppMap(),
-            // Positioned(
-            //   top: 105.0,
-            //   right: 15.0,
-            //   left: 15.0,
-            //   child: Container(
-            //     height: 50.0,
-            //     width: double.infinity,
-            //     decoration: BoxDecoration(
-            //       borderRadius: BorderRadius.circular(3.0),
-            //       color: Colors.white,
-            //       boxShadow: const [
-            //         BoxShadow(
-            //             color: Colors.grey,
-            //             offset: Offset(1.0, 5.0),
-            //             blurRadius: 10,
-            //             spreadRadius: 3)
-            //       ],
-            //     ),
-            //     child: TextField(
-            //       cursorColor: Colors.black,
-            //       controller: AppState.destinationController,
-            //       textInputAction: TextInputAction.go,
-            //       onSubmitted: (value) {
-            //         appState.sendPolyLineRequest(value);
-            //       },
-            //       decoration: InputDecoration(
-            //         icon: Container(
-            //           margin: const EdgeInsets.only(left: 20, top: 5),
-            //           width: 10,
-            //           height: 10,
-            //           child: const Icon(
-            //             Icons.local_taxi,
-            //             color: Colors.black,
-            //           ),
-            //         ),
-            //         hintText: "destination?",
-            //         border: InputBorder.none,
-            //         contentPadding:
-            //             const EdgeInsets.only(left: 15.0, top: 16.0),
-            //       ),
-            //     ),
-            //   ),
-            // ),
-            Column(
-              // alignment: AlignmentDirectional.bottomCenter,
-              mainAxisAlignment: MainAxisAlignment.end,
-              crossAxisAlignment: CrossAxisAlignment.end,
-              children: [
-                Container(
-                  // width: scrSize.width,
-                  // height: 150,
-                  padding: const EdgeInsets.only(right: 30),
-                  alignment: Alignment.topRight,
-                  child: SizedBox(
-                    height: 50,
-                    width: 50,
-                    child: FloatingActionButton(
-                        onPressed: () {
-                          appState.getUserLocation();
-                          setState(() {
-                            appState.onCreated;
-                            appState.mapController.animateCamera(
-                                CameraUpdate.newCameraPosition(
-                                    appState.lastPosition));
-                          });
-                        },
-                        tooltip: 'My location',
-                        backgroundColor: AppColors.appBlue,
-                        child: const Icon(
-                          Icons.add_location,
-                          color: AppColors.light,
-                        )),
-                  ),
-                ),
-                const SizedBox(
-                  height: 20,
-                ),
-                const BottomDrawer(
-                  //length: DrawerLength.defult,
-                  searchBarAtDown: true,
-                ),
-              ],
-            ),
-          ],
-        ),
+      bottomSheet: const BottomDrawer(
+        length: DrawerLength.defult,
+        searchBarAtDown: true,
       ),
+      body: (appState.position == null)
+          ? const Center(
+              child: CircularProgressIndicator(),
+            )
+          : SafeArea(
+              child: Stack(
+                children: [
+                  const AppMap(),
+                  Column(
+                    mainAxisAlignment: MainAxisAlignment.end,
+                    crossAxisAlignment: CrossAxisAlignment.end,
+                    children: [
+                      Container(
+                        width: scrSize.width,
+                        height: 150,
+                        padding: const EdgeInsets.only(right: 30),
+                        alignment: Alignment.topRight,
+                        child: SizedBox(
+                          height: 50,
+                          width: 50,
+                          child: FloatingActionButton(
+                              onPressed: () {
+                                appState.getCurrentLocation();
+                                setState(() {
+                                  appState.onCreated;
+                                  appState.mapController.animateCamera(
+                                      CameraUpdate.newCameraPosition(
+                                          appState.lastPosition));
+                                });
+                              },
+                              tooltip: 'My location',
+                              backgroundColor: AppColors.appBlue,
+                              child: const Icon(
+                                Icons.add_location,
+                                color: AppColors.light,
+                              )),
+                        ),
+                      ),
+                      const SizedBox(
+                        height: 30,
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            ),
     );
   }
 }
