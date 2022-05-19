@@ -11,17 +11,11 @@ import 'package:provider/provider.dart';
 import 'package:smart_parking_system/dataStorage/storage_items.dart';
 import 'package:smart_parking_system/dataStorage/user_address.dart';
 import 'package:smart_parking_system/handler/appdata.dart';
-import '../dataStorage/storage.dart';
 
-SecureStorage locker = SecureStorage();
-final apiKeyWrite = locker.writeSecureData(api);
-final apiKeyRead = locker.readSecureData('API');
+final apiKeyRead = storageRefresh();
 
 class MapFunctions with ChangeNotifier {
-  MapFunctions() {
-    getCurrentLocation().then((value) => _initialPosition = value);
-  }
-  LatLng _initialPosition = const LatLng(22.2604, 84.8536);
+  LatLng _initialPosition = const LatLng(22.2604, 64.8536); //84.8536
   // late LatLng _initialPosition;
   late LatLng _lastPosition = _initialPosition;
   bool locationServiceActive = true;
@@ -30,13 +24,13 @@ class MapFunctions with ChangeNotifier {
   final Completer<GoogleMapController> _mapController =
       Completer<GoogleMapController>();
   Position? position;
-  final MapsPolyline _mapsPolylines = MapsPolyline();
+  //final MapsPolyline _mapsPolylines = MapsPolyline();
   static TextEditingController locationController = TextEditingController();
   static TextEditingController destinationController = TextEditingController();
   CameraPosition get initialPosition =>
       CameraPosition(target: _initialPosition, zoom: 16);
   CameraPosition get lastPosition => initialPosition;
-  MapsPolyline get mapsPolylines => _mapsPolylines;
+  //MapsPolyline get mapsPolylines => _mapsPolylines;
   late GoogleMapController mapController;
   Set<Marker> get markers => _markers;
   Set<Polyline> get polyLines => _polyLines;
@@ -44,6 +38,10 @@ class MapFunctions with ChangeNotifier {
       pFormattedAddress: locationController.text,
       latitude: _lastPosition.latitude,
       longitude: _lastPosition.longitude);
+
+  MapFunctions() {
+    getCurrentLocation().then((value) => _initialPosition = value);
+  }
 
 // ! TO GET THE USERS LOCATION
   Future<LatLng> getCurrentLocation() async {
@@ -187,53 +185,6 @@ class MapFunctions with ChangeNotifier {
     notifyListeners();
   }
 
-  @override
-  void dispose() {
-    _disposeController();
-    super.dispose();
-  }
-}
-
-class MapsPolyline {
-  Future<String> getRouteCoordinates(LatLng l1, LatLng l2) async {
-    String urlPolyline =
-        "https://maps.googleapis.com/maps/api/directions/json?origin=${l1.latitude},${l1.longitude}&destination=${l2.latitude},${l2.longitude}&key=$apiKeyRead";
-    http.Response response = await http.get(Uri.parse(urlPolyline));
-    Map values = jsonDecode(response.body);
-    return values["routes"][0]["overview_polyline"]["points"];
-  }
-}
-
-class LocationGeocodeRequest {
-  static Future<dynamic> locationGeocodeRequest(String urlPlace) async {
-    try {
-      http.Response response = await http.get(Uri.parse(urlPlace));
-      Map values = jsonDecode(response.body);
-      return values;
-    } catch (e) {
-      return "failed";
-    }
-  }
-}
-
-class LocationReverseGeocodeRequest {
-  Future<String> locationReverseGeocodeRequest(
-      LatLng l1, BuildContext context) async {
-    String urlPlace =
-        "https://maps.googleapis.com/maps/api/geocode/json?latlng=${l1.latitude},${l1.longitude}&region=in&key=$apiKeyRead";
-    Map values = await LocationGeocodeRequest.locationGeocodeRequest(urlPlace);
-
-    UserAddress userAddress = UserAddress(
-        pFormattedAddress: values["results"][0]["formatted_address"],
-        latitude: l1.latitude,
-        longitude: l1.longitude);
-    Provider.of<AppData>(context, listen: false)
-        .updateUserLocation(userAddress);
-    return values["results"][0]["formatted_address"];
-  }
-}
-
-class GoogleMapsServices {
   Future<Map<String, dynamic>> getDirections(LatLng l1, LatLng l2) async {
     String url =
         "https://maps.googleapis.com/maps/api/directions/json?origin=${l1.latitude},${l1.longitude}&destination=${l2.latitude},${l2.longitude}&key=$apiKeyRead";
@@ -250,5 +201,44 @@ class GoogleMapsServices {
     };
 
     return results;
+  }
+
+  Future<String> getRouteCoordinates(LatLng l1, LatLng l2) async {
+    String urlPolyline =
+        "https://maps.googleapis.com/maps/api/directions/json?origin=${l1.latitude},${l1.longitude}&destination=${l2.latitude},${l2.longitude}&key=$apiKeyRead";
+    http.Response response = await http.get(Uri.parse(urlPolyline));
+    Map values = jsonDecode(response.body);
+    return values["routes"][0]["overview_polyline"]["points"];
+  }
+
+  static Future<dynamic> locationGeocodeRequest(String urlPlace) async {
+    try {
+      http.Response response = await http.get(Uri.parse(urlPlace));
+      Map values = jsonDecode(response.body);
+      return values;
+    } catch (e) {
+      return "failed";
+    }
+  }
+
+  Future<String> locationReverseGeocodeRequest(
+      LatLng l1, BuildContext context) async {
+    String urlPlace =
+        "https://maps.googleapis.com/maps/api/geocode/json?latlng=${l1.latitude},${l1.longitude}&region=in&key=$apiKeyRead";
+    Map values = await locationGeocodeRequest(urlPlace);
+
+    UserAddress userAddress = UserAddress(
+        pFormattedAddress: values["results"][0]["formatted_address"],
+        latitude: l1.latitude,
+        longitude: l1.longitude);
+    Provider.of<AppData>(context, listen: false)
+        .updateUserLocation(userAddress);
+    return values["results"][0]["formatted_address"];
+  }
+
+  @override
+  void dispose() {
+    _disposeController();
+    super.dispose();
   }
 }

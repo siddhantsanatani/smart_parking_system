@@ -16,52 +16,53 @@ class ApplicationBloc with ChangeNotifier {
   //Variables
   late LatLng location;
   late Position? currentLocation;
-  late List<PlaceSearch>? searchResults;
-  late StreamController<Place>? selectedLocation = StreamController<Place>();
+  late List<PlaceSearch>? searchResults = [];
+  late StreamController<Place>? selectedLocation =
+      StreamController<Place>.broadcast();
   late StreamController<LatLngBounds>? bounds =
-      StreamController<LatLngBounds>();
+      StreamController<LatLngBounds>.broadcast();
   late Place selectedLocationStatic;
-  late String? placeType;
-  late List<Place> placeResults;
-  late List<Marker> markers;
+  late String? placeType = '';
+  late List<Place> placeResults = [];
+  late List<Marker> markers = [];
 
-  ApplicationBloc() {
-    setCurrentLocation();
-  }
+  // ApplicationBloc() {
+  //   setCurrentLocation();
+  // }
 
-  setCurrentLocation() async {
-    location = await geoLocatorService.getCurrentLocation();
-    currentLocation = geoLocatorService.position;
-    selectedLocationStatic = Place(
-      name: null,
-      vicinity: "",
-      geometry: Geometry(
-        location: Location(lat: location.latitude, lng: location.longitude),
-      ),
-    );
-    notifyListeners();
-  }
+  // setCurrentLocation() async {
+  //   location = await geoLocatorService.getCurrentLocation();
+  //   currentLocation = geoLocatorService.position;
+  //   selectedLocationStatic = Place(
+  //     name: '',
+  //     vicinity: "",
+  //     geometry: Geometry(
+  //       location: Location(lat: location.latitude, lng: location.longitude),
+  //     ),
+  //   );
+  //   notifyListeners();
+  // }
 
   searchPlaces(String searchTerm) async {
     searchResults = await placesService.getAutocomplete(searchTerm);
     notifyListeners();
   }
 
-  setSelectedLocation(String placeId) async {
-    var sLocation = await placesService.getPlace(placeId);
-    selectedLocation!.add(sLocation);
-    selectedLocationStatic = sLocation;
-    searchResults = null;
-    notifyListeners();
-  }
+  // setSelectedLocation(String placeId) async {
+  //   var sLocation = await placesService.getPlace(placeId);
+  //   selectedLocation!.add(sLocation);
+  //   selectedLocationStatic = sLocation;
+  //   searchResults = null;
+  //   notifyListeners();
+  // }
 
-  clearSelectedLocation() {
-    //selectedLocation!.add(null);
-    //selectedLocationStatic= null;
-    searchResults = null;
-    placeType = null;
-    notifyListeners();
-  }
+  // clearSelectedLocation() {
+  //   //selectedLocation!.add(null);
+  //   //selectedLocationStatic= null;
+  //   searchResults = null;
+  //   placeType = null;
+  //   notifyListeners();
+  // }
 
   togglePlaceType(String value, bool selected) async {
     if (selected) {

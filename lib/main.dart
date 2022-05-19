@@ -11,6 +11,7 @@ import 'Screens/login_screen.dart';
 import 'Screens/home.dart';
 import 'Screens/registration_screen.dart';
 import 'handler/appdata.dart';
+import 'handler/search_moderator.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -24,6 +25,9 @@ Future<void> main() async {
         ),
         ChangeNotifierProvider.value(
           value: SearchBar(),
+        ),
+        ChangeNotifierProvider.value(
+          value: ApplicationBloc(),
         )
         // Provider<SearchBar>(create: (_) => SearchBar()),
         // Provider<AnotherThing>(create: (_) => AnotherThing()),

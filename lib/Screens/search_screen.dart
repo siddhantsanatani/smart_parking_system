@@ -13,7 +13,7 @@ class SearchScreen extends StatefulWidget {
   const SearchScreen({Key? key}) : super(key: key);
 
   @override
-  _SearchScreenState createState() => _SearchScreenState();
+  State<StatefulWidget> createState() => _SearchScreenState();
 }
 
 class _SearchScreenState extends State<SearchScreen> {
@@ -48,12 +48,13 @@ class _SearchScreenState extends State<SearchScreen> {
 
   @override
   void dispose() {
-    final applicationBloc =
-        Provider.of<ApplicationBloc>(context, listen: false);
-    applicationBloc.dispose();
-    _locationController.dispose();
-    locationSubscription.cancel();
-    boundsSubscription.cancel();
+    // final applicationBloc =
+    //     Provider.of<ApplicationBloc>(context, listen: false);
+    // applicationBloc.dispose();
+    // _locationController.dispose();
+    // locationSubscription.cancel();
+    // boundsSubscription.cancel();
+    //dispose();
     super.dispose();
   }
 
@@ -61,102 +62,98 @@ class _SearchScreenState extends State<SearchScreen> {
   Widget build(BuildContext context) {
     final applicationBloc = Provider.of<ApplicationBloc>(context);
     return Scaffold(
-        body: (applicationBloc.currentLocation == null)
-            ? const Center(
-                child: CircularProgressIndicator(),
-              )
-            : ListView(
-                children: [
-                  Padding(
-                      padding: const EdgeInsets.all(8.0), child: SearchBar()),
-                  Stack(
-                    children: [
-                      if (applicationBloc.searchResults != null &&
-                          applicationBloc.searchResults!.isNotEmpty)
-                        Container(
-                            height: 300.0,
-                            width: double.infinity,
-                            decoration: BoxDecoration(
-                                color: Colors.black.withOpacity(.6),
-                                backgroundBlendMode: BlendMode.darken)),
-                      if (applicationBloc.searchResults != null)
-                        SizedBox(
-                          height: 300.0,
-                          child: ListView.builder(
-                              itemCount: applicationBloc.searchResults!.length,
-                              itemBuilder: (context, index) {
-                                return ListTile(
-                                  title: Text(
-                                    applicationBloc
-                                        .searchResults![index].description!,
-                                    style: const TextStyle(color: Colors.white),
-                                  ),
-                                  onTap: () {
-                                    applicationBloc.setSelectedLocation(
-                                        applicationBloc
-                                            .searchResults![index].placeId!);
-                                  },
-                                );
-                              }),
+        body: ListView(
+      children: [
+        Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: SearchBar(
+              autofocus: true,
+            )),
+        Stack(
+          children: [
+            if (applicationBloc.searchResults != null &&
+                applicationBloc.searchResults!.isNotEmpty)
+              Container(
+                  height: 300.0,
+                  width: double.infinity,
+                  decoration: BoxDecoration(
+                      color: Colors.black.withOpacity(.6),
+                      backgroundBlendMode: BlendMode.darken)),
+            if (applicationBloc.searchResults != null)
+              SizedBox(
+                height: 300.0,
+                child: ListView.builder(
+                    itemCount: applicationBloc.searchResults!.length,
+                    itemBuilder: (context, index) {
+                      return ListTile(
+                        title: Text(
+                          applicationBloc.searchResults![index].description!,
+                          style: const TextStyle(color: Colors.black),
                         ),
-                    ],
-                  ),
-                  const SizedBox(
-                    height: 20.0,
-                  ),
-                  const Padding(
-                    padding: EdgeInsets.all(8.0),
-                    child: Text('Find Nearest',
-                        style: TextStyle(
-                            fontSize: 25.0, fontWeight: FontWeight.bold)),
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: Wrap(
-                      spacing: 8.0,
-                      children: [
-                        FilterChip(
-                          label: const Text('Campground'),
-                          onSelected: (val) => applicationBloc.togglePlaceType(
-                              'campground', val),
-                          selected: applicationBloc.placeType == 'campground',
-                          selectedColor: Colors.blue,
-                        ),
-                        FilterChip(
-                            label: const Text('Locksmith'),
-                            onSelected: (val) => applicationBloc
-                                .togglePlaceType('locksmith', val),
-                            selected: applicationBloc.placeType == 'locksmith',
-                            selectedColor: Colors.blue),
-                        FilterChip(
-                            label: const Text('Pharmacy'),
-                            onSelected: (val) => applicationBloc
-                                .togglePlaceType('pharmacy', val),
-                            selected: applicationBloc.placeType == 'pharmacy',
-                            selectedColor: Colors.blue),
-                        FilterChip(
-                            label: const Text('Pet Store'),
-                            onSelected: (val) => applicationBloc
-                                .togglePlaceType('pet_store', val),
-                            selected: applicationBloc.placeType == 'pet_store',
-                            selectedColor: Colors.blue),
-                        FilterChip(
-                            label: const Text('Lawyer'),
-                            onSelected: (val) =>
-                                applicationBloc.togglePlaceType('lawyer', val),
-                            selected: applicationBloc.placeType == 'lawyer',
-                            selectedColor: Colors.blue),
-                        FilterChip(
-                            label: const Text('Bank'),
-                            onSelected: (val) =>
-                                applicationBloc.togglePlaceType('bank', val),
-                            selected: applicationBloc.placeType == 'bank',
-                            selectedColor: Colors.blue),
-                      ],
-                    ),
-                  )
-                ],
-              ));
+                        onTap: () {
+                          // applicationBloc.setSelectedLocation(
+                          //     applicationBloc.searchResults![index].placeId!);
+                        },
+                      );
+                    }),
+              ),
+          ],
+        ),
+        const SizedBox(
+          height: 20.0,
+        ),
+        const Padding(
+          padding: EdgeInsets.all(8.0),
+          child: Text('Find Nearest',
+              style: TextStyle(fontSize: 25.0, fontWeight: FontWeight.bold)),
+        ),
+        Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: Wrap(
+            spacing: 8.0,
+            children: [
+              FilterChip(
+                label: const Text('Campground'),
+                onSelected: (val) =>
+                    applicationBloc.togglePlaceType('campground', val),
+                selected: applicationBloc.placeType == 'campground',
+                selectedColor: Colors.blue,
+              ),
+              FilterChip(
+                  label: const Text('Locksmith'),
+                  onSelected: (val) =>
+                      applicationBloc.togglePlaceType('locksmith', val),
+                  selected: applicationBloc.placeType == 'locksmith',
+                  selectedColor: Colors.blue),
+              FilterChip(
+                  label: const Text('Pharmacy'),
+                  onSelected: (val) =>
+                      applicationBloc.togglePlaceType('pharmacy', val),
+                  selected: applicationBloc.placeType == 'pharmacy',
+                  selectedColor: Colors.blue),
+              FilterChip(
+                  label: const Text('Pet Store'),
+                  onSelected: (val) =>
+                      applicationBloc.togglePlaceType('pet_store', val),
+                  selected: applicationBloc.placeType == 'pet_store',
+                  selectedColor: Colors.blue),
+              FilterChip(
+                  label: const Text('Lawyer'),
+                  onSelected: (val) =>
+                      applicationBloc.togglePlaceType('lawyer', val),
+                  selected: applicationBloc.placeType == 'lawyer',
+                  selectedColor: Colors.blue),
+              FilterChip(
+                  label: const Text('Bank'),
+                  onSelected: (val) =>
+                      applicationBloc.togglePlaceType('bank', val),
+                  selected: applicationBloc.placeType == 'bank',
+                  selectedColor: Colors.blue),
+            ],
+          ),
+        )
+      ],
+    ));
   }
 
   Future<void> _goToPlace(Place place) async {

@@ -51,7 +51,7 @@ class _FrostedAppBarState extends State<FrostedAppBar> {
           leadingWidth: 70,
           backgroundColor: AppColors.white.withOpacity(0.5),
           leading: Container(
-            height: 50,
+            height: 56,
             margin: const EdgeInsets.only(left: 15.0),
             decoration: BoxDecoration(
                 color: AppColors.mapLight.withOpacity(0.4),

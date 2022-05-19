@@ -4,10 +4,13 @@ import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:provider/provider.dart';
 import 'package:smart_parking_system/handler/mapfunctions.dart';
 import 'package:smart_parking_system/tools/bottom_drawer.dart';
+import '../dataStorage/storage_items.dart';
 import '../design_system/glassmorphism.dart';
 import '../tools/map.dart';
 import '/design_system/styles.dart';
 import '../tools/navigation_drawer.dart';
+
+final apiKeyRead = storageRefresh();
 
 class HomeScreen extends StatefulWidget {
   static String id = 'home_screen';
@@ -50,28 +53,25 @@ class _HomeScreen extends State<HomeScreen> {
           elevation: 10,
           icon: const Icon(
             Icons.menu_rounded,
-            size: 28,
+            size: 24,
           ),
           actions: [
             Container(
-              // width: 48,
+              width: 56,
               // height: 48,
               margin: const EdgeInsets.only(right: 15.0),
               decoration: BoxDecoration(
                   color: AppColors.mapLight.withOpacity(0.4),
                   borderRadius: const BorderRadius.all(Radius.circular(56))),
               child: SizedBox(
-                width: 56,
+                height: 48,
                 child: IconButton(
-                  padding: const EdgeInsets.all(0),
+                  padding: const EdgeInsets.symmetric(vertical: 4),
                   color: AppColors.dark,
-                  //iconSize: 20,
                   icon: const Icon(
                     Icons.notifications_rounded,
                   ),
-                  onPressed: () {
-                    // do something
-                  },
+                  onPressed: () {},
                 ),
               ),
             ),
@@ -84,56 +84,57 @@ class _HomeScreen extends State<HomeScreen> {
         ),
       ),
       drawer: const NavigationDrawerWidget(),
-      bottomSheet: const BottomDrawer(
-        length: DrawerLength.defult,
-        searchBarAtDown: true,
-      ),
-      body: (appState.position == null)
-          ? const Center(
-              child: CircularProgressIndicator(),
-            )
-          : SafeArea(
-              child: Stack(
-                children: [
-                  const AppMap(),
-                  Column(
-                    mainAxisAlignment: MainAxisAlignment.end,
-                    crossAxisAlignment: CrossAxisAlignment.end,
-                    children: [
-                      Container(
-                        width: scrSize.width,
-                        height: 150,
-                        padding: const EdgeInsets.only(right: 30),
-                        alignment: Alignment.topRight,
-                        child: SizedBox(
-                          height: 50,
-                          width: 50,
-                          child: FloatingActionButton(
-                              onPressed: () {
-                                appState.getCurrentLocation();
-                                setState(() {
-                                  appState.onCreated;
-                                  appState.mapController.animateCamera(
-                                      CameraUpdate.newCameraPosition(
-                                          appState.lastPosition));
-                                });
-                              },
-                              tooltip: 'My location',
-                              backgroundColor: AppColors.appBlue,
-                              child: const Icon(
-                                Icons.add_location,
-                                color: AppColors.light,
-                              )),
-                        ),
-                      ),
-                      const SizedBox(
-                        height: 30,
-                      ),
-                    ],
-                  ),
-                ],
-              ),
+      body:
+          // (appState.position == null)
+          //     ? const Center(
+          //         child: CircularProgressIndicator(),
+          //       )
+          //     :
+          SafeArea(
+        child: Stack(
+          children: [
+            const AppMap(),
+            const BottomDrawer(
+              searchBarAtDown: true,
             ),
+            Column(
+              mainAxisAlignment: MainAxisAlignment.end,
+              crossAxisAlignment: CrossAxisAlignment.end,
+              children: [
+                Container(
+                  width: scrSize.width,
+                  height: 150,
+                  padding: const EdgeInsets.only(right: 30),
+                  alignment: Alignment.topRight,
+                  child: SizedBox(
+                    height: 50,
+                    width: 50,
+                    child: FloatingActionButton(
+                        onPressed: () {
+                          appState.getCurrentLocation();
+                          setState(() {
+                            appState.onCreated;
+                            appState.mapController.animateCamera(
+                                CameraUpdate.newCameraPosition(
+                                    appState.lastPosition));
+                          });
+                        },
+                        tooltip: 'My location',
+                        backgroundColor: AppColors.appBlue,
+                        child: const Icon(
+                          Icons.add_location,
+                          color: AppColors.light,
+                        )),
+                  ),
+                ),
+                const SizedBox(
+                  height: 30,
+                ),
+              ],
+            ),
+          ],
+        ),
+      ),
     );
   }
 }
