@@ -8,7 +8,7 @@ final apiKeyRead = storageRefresh();
 class PlacesService {
   Future<List<PlaceSearch>> getAutocomplete(String search) async {
     String url =
-        'https://maps.googleapis.com/maps/api/place/autocomplete/json?input=$search&types=(cities)&key=AIzaSyDn0JDf14CZS7HqXzq8LCfMGKst54zC7Jo';
+        'https://maps.googleapis.com/maps/api/place/autocomplete/json?input=$search&types=(cities)&key=$apiKeyRead';
     http.Response response =
         await http.get(Uri.parse(url)); //await http.get(Uri.parse(urlPolyline))
     var json = convert.jsonDecode(response.body);
